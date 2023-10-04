@@ -9,6 +9,9 @@ export const load = async ({ fetch, data, depends }) => {
         supabaseKey: PUBLIC_SUPABASE_KEY,
         event: { fetch },
         serverSession: data.session,
+        cookieOptions: {
+            domain: PUBLIC_DOMAIN
+        }
     })
 
     const {
