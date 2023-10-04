@@ -1,7 +1,15 @@
+import { redirect } from '@sveltejs/kit';
+import { PUBLIC_AUTH_URL } from '$env/static/public'
+
 let passCollections
 let userId
 
 export async function load({ parent, locals: { supabase } }) {
+    const { session } = await parent()
+    if (!session) throw redirect(303, PUBLIC_AUTH_URL)
+
+    userId = session.user.id
+
     const [{ data: collections }, { data: pages }] = await Promise.all([
         supabase
             .from('collections')
@@ -10,8 +18,6 @@ export async function load({ parent, locals: { supabase } }) {
             .from('pages')
             .select('*')
     ])
-    const { session } = await parent()
-    userId = session.user.id
 
     passCollections = collections
 
