@@ -1,6 +1,7 @@
 <script>
 	import { invalidate } from '$app/navigation'
 	import { onMount } from 'svelte'
+	import { PUBLIC_DOMAIN } from '$env/static/public'
 
 	export let data
 
@@ -10,7 +11,7 @@
 	onMount(() => {
 		const {
 			data: { subscription }
-		} = supabase.auth.onAuthStateChange((_, _session) => {
+		} = supabase.auth.onAuthStateChange((event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth')
 			}

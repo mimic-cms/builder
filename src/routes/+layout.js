@@ -11,7 +11,10 @@ export const load = async ({ fetch, data, depends }) => {
         serverSession: data.session,
         cookieOptions: {
             domain: PUBLIC_DOMAIN
-        }
+        },
+        auth: {
+            flowType: 'pkce',
+        },
     })
 
     const {
