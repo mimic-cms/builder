@@ -4,6 +4,14 @@ import { PUBLIC_AUTH_URL } from '$env/static/public'
 let passCollections
 let userId
 
+/*
+
+create template
+to create page(s), link a template with some data
+do recipes to test
+allow dragging below, to left, to right, and above existing elements. can adjust spacing in x increment by arrow keys?
+when click, can center left right or center
+*/
 export async function load({ parent, locals: { supabase } }) {
     const { session } = await parent()
     if (!session) throw redirect(303, PUBLIC_AUTH_URL)
@@ -28,46 +36,19 @@ export async function load({ parent, locals: { supabase } }) {
 }
 
 export const actions = {
-    create: async ({ request, locals: { supabase } }) => {
-        const data = await request.formData();
-        const selectedCollection = data.get('collection') ? passCollections.find((col) => col.collection_name === data.get('collection')) : null
-        const insertItems = []
-        data.get('collection') !== null
-            ? (selectedCollection.collection_data.forEach((collData => {
-                insertItems.push({
-                    page_path: selectedCollection.collection_name + '/' + collData[data.get('dynamic_path')],
-                    page_context: selectedCollection.collection_id,
-                    page_layout: {
-                        component: {
-                            name: data.get('component'),
-                            slots: {
-                                default: data.get('text')
-                            }
-                        }
-                    },
-                    user_id: userId
-                })
-            })))
-            : insertItems.push({
-                page_path: data.get('path'),
-                page_context: null,
-                page_layout: {
-                    component: {
-                        name: data.get('component'),
-                        slots: {
-                            default: data.get('text')
-                        }
-                    }
-                },
-                user_id: userId
-            })
-        await supabase.from('pages').insert(insertItems)
-    },
     data: async ({ request, locals: { supabase } }) => {
         const data = await request.formData();
+        const collectionData = []
+        for (let i = 1; data.get(`entity-${i}-field-1`); i++) {
+            let entity = {}
+            for (let j = 1; data.get(`entity-${i}-field-${j}`); j++) {
+                entity[data.get(`entity-${i}-field-${j}`)] = data.get(`entity-${i}-value-${j}`)
+            }
+            collectionData.push(entity)
+        }
         await supabase.from('collections').insert([{
             collection_name: data.get('collection'),
-            collection_data: [{ [data.get('field1')]: data.get('value1') }, { [data.get('field2')]: data.get('value2') }],
+            collection_data: collectionData,
             user_id: userId
         }])
     }
